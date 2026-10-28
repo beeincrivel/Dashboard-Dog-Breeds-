@@ -1,73 +1,93 @@
-"""Leitura dos arquivos CSV do projeto."""
+"""Leitura e processamento dos dados do projeto de Raças de Cães."""
 
 import csv
 from pathlib import Path
 
-# Pasta onde este arquivo .py está. Assim o programa encontra o CSV
-# mesmo quando é executado a partir de outra pasta (como no Streamlit Cloud).
+# Garante que o Python encontre o CSV na mesma pasta deste script (evita FileNotFoundError)
 PASTA = Path(__file__).parent
-CAMINHO_RACAS = PASTA / "racas-de-caes.csv"
+CAMINHO_CAES = PASTA / "racas-de-caes.csv"
 
 
-def ler_caes():
-    """Lê o CSV de caes e devolve uma lista de dicionários.
-
-    Os valores vêm do jeito que estão no arquivo, ou seja, como texto:
-    {"titulo": "Sharp Objects", "preco": "£47.82", "nota": "Four", ...}
-    """
-    caes = []
+def ler_racas():
+    """Lê o CSV de raças de cães e devolve uma lista de dicionários."""
+    racas = []
     try:
-        with open(CAMINHO_RACAS, "r", encoding="utf-8") as arquivo:
-            leitor = csv.DictReader(arquivo)
+        with open(CAMINHO_CAES, "r", encoding="utf-8") as ficheiro:
+            leitor = csv.DictReader(ficheiro)
             for linha in leitor:
-                caes.append(linha)
+                racas.append(linha)
     except FileNotFoundError:
-        print("O arquivo racas-de-caes.csv não foi encontrado")
+        print("⚠️ O ficheiro racas-de-caes.csv não foi encontrado na pasta.")
     except Exception as error:
-        print("Algum erro aconteceu na leitura do arquivo", error)
+        print("⚠️ Ocorreu um erro na leitura do ficheiro:", error)
 
-    return caes
-
-
-def calcular_preco_medio(livros):
-    """Soma os preços de todos os livros e divide pelo total.
-
-    O preço vem como texto ("£51.77"): removemos o "£" e convertemos com float.
-    """
-    soma: float = 0
-    for livro in livros:
-        preco_original: str = livro["preco"]
-        preco_original_limpo: str = preco_original.replace("£", "")
-        preco_num: float = float(preco_original_limpo)
-        soma += preco_num
-
-    preco_medio: float = soma / len(livros)
-    return preco_medio
+    return racas
 
 
-def contar_cinco_estrelas(livros):
-    """Conta quantos livros têm a nota máxima. A nota vem como texto ("Five")."""
-    contador: int = 0
-    for livro in livros:
-        nota_limpa: str = livro["nota"].lower().strip()
-        if nota_limpa == "five":
-            contador += 1
-
-    return contador
+def converter_inteiro(valor):
+    """Converte texto numérico para inteiro de forma segura."""
+    try:
+        return int(valor)
+    except (ValueError, TypeError):
+        return 0
 
 
-def encontrar_mais_caro(livros):
-    """Devolve o livro de maior preço. O preço vem como texto ("£51.77")."""
-    mais_caro = livros[0]
-    for livro in livros:
-        preco = float(livro["preco"].replace("£", ""))
-        preco_mais_caro = float(mais_caro["preco"].replace("£", ""))
-        if preco > preco_mais_caro:
-            mais_caro = livro
-    return mais_caro
+def preparar_racas(linhas):
+    """Converte os campos numéricos das raças lidas do CSV."""
+    racas = []
+    for linha in linhas:
+        raca = {
+            "raca": linha.get("raca", ""),
+            "tipo_pelo": linha.get("tipo_pelo", ""),
+            "comprimento_pelo": linha.get("comprimento_pelo", ""),
+            "energia": converter_inteiro(linha.get("energia", 0)),
+            "treinabilidade": converter_inteiro(linha.get("treinabilidade", 0)),
+            "popularidade": converter_inteiro(linha.get("popularidade_2020", 0)),
+            "link": linha.get("link", "")
+        }
+        racas.append(raca)
+    return racas
+
+
+def carregar_racas():
+    """Lê o CSV e devolve a lista de raças tratadas e prontas para o app."""
+    return preparar_racas(ler_racas())
+
+
+def classificar_energia(energia):
+    """Classifica o nível de energia da raça em faixas explicativas."""
+    if energia <= 2:
+        return "Baixa (Calmo)"
+    elif energia == 3:
+        return "Média (Moderado)"
+    else:
+        return "Alta (Energético)"
+
+
+def calcular_energia_media(racas):
+    """Calcula a média do nível de energia de todas as raças."""
+    if not racas:
+        return 0.0
+    soma = sum(raca["energia"] for raca in racas)
+    return soma / len(racas)
+
+
+def encontrar_mais_popular(racas):
+    """Encontra a raça com menor número de ranking de popularidade (mais bem colocada)."""
+    validas = [r for r in racas if r["popularidade"] > 0]
+    if not validas:
+        return None
+    
+    mais_popular = validas[0]
+    for raca in validas:
+        if raca["popularidade"] < mais_popular["popularidade"]:
+            mais_popular = raca
+    return mais_popular
 
 
 if __name__ == "__main__":
-    caes = ler_caes()
-    print(f"{len(caes)} caes carregados")
-    print("Primeiro ce:", caes[0])
+    # Teste isolado no terminal: execute 'python dados.py'
+    lista_racas = carregar_racas()
+    print(f"✅ {len(lista_racas)} raças de cães carregadas com sucesso!")
+    if lista_racas:
+        print("Exemplo da primeira raça:", lista_racas[0])

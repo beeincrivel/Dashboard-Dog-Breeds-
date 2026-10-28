@@ -4,6 +4,43 @@ Sugestões de datasets para o trabalho da M2, em formato CSV (separador `,`, cod
 
 ---
 
+# 🐶 Dashboard de Raças de Cães
+
+Dashboard interativo desenvolvido em Python com a biblioteca Streamlit para exploração, filtragem e comparação de dados de raças de cães do American Kennel Club (AKC).
+
+## Integrantes: 
+*Brenda 
+*Danilo
+
+## 🚀 Funcionalidades da Aplicação
+
+1. **Métricas Gerais em Tempo Real:**
+   * Total de raças cadastradas na base de dados.
+   * Média geral do nível de energia das raças.
+   * Identificação da raça mais popular com base no ranking de 2020.
+
+2. **Pesquisa e Filtros Dinâmicos:**
+   * Campo de busca interativa por nome da raça.
+   * Filtro avançado por tipo de pelo.
+
+3. **Comparador de Raças Lado a Lado:**
+   * Ferramenta interativa que permite selecionar duas raças e comparar diretamente as suas características (tipo de pelo, comprimento, nível de energia, treinabilidade e popularidade) em formato de tabela lado a lado.
+
+---
+
+## 📂 Estrutura do Projeto
+* `app.py`: Código principal responsável pela interface gráfica, métricas, filtros e pela tabela comparativa no Streamlit.
+* `dados.py`: Módulo responsável pela leitura segura do ficheiro CSV, tratamento de dados, conversões e cálculos estatísticos.
+* `racas-de-caes.csv`: Base de dados oficial contendo as características das raças.
+
+---
+
+## 🛠️ Como Executar o Projeto Localmente
+
+1. Certifique-se de que tem o Python e o Streamlit instalados na sua máquina.
+2. No terminal do VS Code, na pasta do projeto, execute o comando:
+   ```bash
+   streamlit run app.py
 
 ## 7. Raças de cães: `racas-de-caes.csv`
 
