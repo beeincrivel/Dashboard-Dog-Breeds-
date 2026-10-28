@@ -35,12 +35,20 @@ Dashboard interativo desenvolvido em Python com a biblioteca Streamlit para expl
 
 ---
 
-## 🛠️ Como Executar o Projeto Localmente
+   ## Executar
 
-1. Certifique-se de que tem o Python e o Streamlit instalados na sua máquina.
-2. No terminal do VS Code, na pasta do projeto, execute o comando:
-   ```bash
-   streamlit run app.py
+Abra um terminal nesta pasta. Crie um ambiente virtual:
+sh
+python -m venv .venv
+
+
+No Linux/macOS, ative com source .venv/bin/activate. No Windows PowerShell, use .venv\Scripts\Activate.ps1.
+
+Depois execute:
+
+```sh
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
 
 ## 7. Raças de cães: `racas-de-caes.csv`
 
