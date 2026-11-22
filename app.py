@@ -81,9 +81,11 @@ def main():
     if len(nomes_racas) >= 2:
         col_comp1, col_comp2 = st.columns(2)
         raca_1_nome = col_comp1.selectbox("Escolha a 1ª Raça para Comparar", nomes_racas, index=0)
-        raca_2_nome = col_comp2.selectbox("Escolha a 2ª Raça para Comparar", nomes_racas, index=min(1, len(nomes_racas) - 1))
+        opcoes_segunda_raca = [nome for nome in nomes_racas if nome != raca_1_nome]
+        raca_2_nome = col_comp2.selectbox("Escolha a 2ª Raça para Comparar", opcoes_segunda_raca)
 
-        # Obter os dados completos das raças selecionadas
+
+        
         info_raca1 = next((r for r in racas if r["raca"] == raca_1_nome), None)
         info_raca2 = next((r for r in racas if r["raca"] == raca_2_nome), None)
 
