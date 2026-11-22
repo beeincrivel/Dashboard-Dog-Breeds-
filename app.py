@@ -54,6 +54,9 @@ def main():
 
     # Carreg
     racas = dados.carregar_racas()
+    if not racas:
+        st.error("Não foi possível carregar as raças. Verifique o arquivo racas-de-caes.csv.")
+        st.stop()
 
     # --- 3 MÉTRICAS OBRIGATÓRIAS ---
     col1, col2, col3 = st.columns(3)
