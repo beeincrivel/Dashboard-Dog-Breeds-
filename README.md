@@ -1,16 +1,10 @@
-# Datasets do Trabalho M2
-
-Sugestões de datasets para o trabalho da M2, em formato CSV (separador `,`, codificação UTF-8).
-
----
-
 # 🐶 Dashboard de Raças de Cães
 
 Dashboard interativo desenvolvido em Python com a biblioteca Streamlit para exploração, filtragem e comparação de dados de raças de cães do American Kennel Club (AKC).
 
 ## Integrantes: 
-*Brenda 
-*Danilo
+- Brenda
+- Danilo
 
 ## 🚀 Funcionalidades da Aplicação
 
@@ -35,22 +29,30 @@ Dashboard interativo desenvolvido em Python com a biblioteca Streamlit para expl
 
 ---
 
-   ## Executar
+## Como executar
 
-Abra um terminal nesta pasta. Crie um ambiente virtual:
-sh
+Abra o terminal na pasta do projeto.
+
+### Windows (PowerShell)
+
+```powershell
 python -m venv .venv
-
-
-No Linux/macOS, ative com source .venv/bin/activate. No Windows PowerShell, use .venv\Scripts\Activate.ps1.
-
-Depois execute:
-
-```sh
+.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m streamlit run app.py
+```
 
-## 7. Raças de cães: `racas-de-caes.csv`
+### Linux/macOS
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
+
+
+## Base de dados: `racas-de-caes.csv`
 
 - **Fonte original:** [American Kennel Club](https://www.akc.org/dog-breeds/), coletado por [KKakey](https://github.com/kkakey/dog_traits_AKC)
 - **Obtido via:** [TidyTuesday 2022-02-01](https://github.com/rfordatascience/tidytuesday/tree/main/data/2022/2022-02-01)
