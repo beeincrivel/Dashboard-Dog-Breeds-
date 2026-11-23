@@ -6,6 +6,8 @@ from pathlib import Path
 # Garante que o Python encontre o CSV na mesma pasta deste script (evita FileNotFoundError)
 PASTA = Path(__file__).parent
 CAMINHO_CAES = PASTA / "racas-de-caes.csv"
+CAMINHO_FAVORITOS = PASTA / "favoritos.csv"
+CAMPOS_FAVORITOS = ["raca", "status", "comentario"]
 
 
 def ler_racas():
@@ -83,6 +85,47 @@ def encontrar_mais_popular(racas):
         if raca["popularidade"] < mais_popular["popularidade"]:
             mais_popular = raca
     return mais_popular
+
+def carregar_favoritos():
+    """Lê os favoritos do CSV e devolve um dicionário."""
+    favoritos = {}
+
+    if not CAMINHO_FAVORITOS.exists():
+        return favoritos
+
+    with open(CAMINHO_FAVORITOS, "r", encoding="utf-8", newline="") as arquivo:
+        leitor = csv.DictReader(arquivo)
+        for linha in leitor:
+            favoritos[linha["raca"]] = linha
+
+    return favoritos
+
+
+def salvar_favorito(raca):
+    """Adiciona uma raça aos favoritos, evitando duplicações."""
+    favoritos = carregar_favoritos()
+
+    if raca["raca"] in favoritos:
+        return False
+
+    arquivo_novo = (
+        not CAMINHO_FAVORITOS.exists()
+        or CAMINHO_FAVORITOS.stat().st_size == 0
+    )
+
+    with open(CAMINHO_FAVORITOS, "a", encoding="utf-8", newline="") as arquivo:
+        escritor = csv.DictWriter(arquivo, fieldnames=CAMPOS_FAVORITOS)
+
+        if arquivo_novo:
+            escritor.writeheader()
+
+        escritor.writerow({
+            "raca": raca["raca"],
+            "status": "Quero conhecer",
+            "comentario": ""
+        })
+
+    return True
 
 
 if __name__ == "__main__":
