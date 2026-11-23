@@ -58,98 +58,134 @@ def main():
         st.error("Não foi possível carregar as raças. Verifique o arquivo racas-de-caes.csv.")
         st.stop()
 
-    # --- 3 MÉTRICAS OBRIGATÓRIAS ---
-    col1, col2, col3 = st.columns(3)
-    
-    qtd_racas = len(racas)
-    col1.metric("Total de Raças", qtd_racas)
+    aba_catalogo, aba_comparador, aba_favoritos = st.tabs(
+        ["🐶 Catálogo", "⚖️ Comparador", "⭐ Favoritos"]
+    )
 
-    energia_media = dados.calcular_energia_media(racas)
-    col2.metric("Energia Média Geral", f"{energia_media:.1f} / 5")
-
-    mais_popular = dados.encontrar_mais_popular(racas)
-    if mais_popular:
-        col3.metric("Raça Mais Popular (2020)", mais_popular["raca"])
-        col3.caption(f"Ranking #{mais_popular['popularidade']}")
-
-    st.markdown("---")
-
-    # --- SEÇÃO DE COMPARADOR LADO A LADO ---
-    st.header("⚖️ Comparador de Raças Lado a Lado")
-    st.markdown("Selecione duas raças para comparar as suas características principais em formato de tabela:")
-
-    nomes_racas = [r["raca"] for r in racas]
-    nomes_racas.sort()
-
-    if len(nomes_racas) >= 2:
-        col_comp1, col_comp2 = st.columns(2)
-        raca_1_nome = col_comp1.selectbox("Escolha a 1ª Raça para Comparar", nomes_racas, index=0)
-        opcoes_segunda_raca = [nome for nome in nomes_racas if nome != raca_1_nome]
-        raca_2_nome = col_comp2.selectbox("Escolha a 2ª Raça para Comparar", opcoes_segunda_raca)
-
-
+    with aba_catalogo:
+        col1, col2, col3 = st.columns(3)
         
-        info_raca1 = next((r for r in racas if r["raca"] == raca_1_nome), None)
-        info_raca2 = next((r for r in racas if r["raca"] == raca_2_nome), None)
+        qtd_racas = len(racas)
+        col1.metric("Total de Raças", qtd_racas)
 
-        if info_raca1 and info_raca2:
-            # Montar uma tabela dedicada para a comparação
-            tabela_comparacao = [
-                {
-                    "Característica / Atributo": "Raça",
-                    f"{info_raca1['raca']}": info_raca1['raca'],
-                    f"{info_raca2['raca']}": info_raca2['raca']
-                },
-                {
-                    "Característica / Atributo": "Tipo de Pelo",
-                    f"{info_raca1['raca']}": info_raca1['tipo_pelo'],
-                    f"{info_raca2['raca']}": info_raca2['tipo_pelo']
-                },
-                {
-                    "Característica / Atributo": "Comprimento do Pelo",
-                    f"{info_raca1['raca']}": info_raca1['comprimento_pelo'],
-                    f"{info_raca2['raca']}": info_raca2['comprimento_pelo']
-                },
-                {
-                    "Característica / Atributo": "Nível de Energia (1 a 5)",
-                    f"{info_raca1['raca']}": f"{info_raca1['energia']} / 5 ({dados.classificar_energia(info_raca1['energia'])})",
-                    f"{info_raca2['raca']}": f"{info_raca2['energia']} / 5 ({dados.classificar_energia(info_raca2['energia'])})"
-                },
-                {
-                    "Característica / Atributo": "Treinabilidade",
-                    f"{info_raca1['raca']}": "⭐" * info_raca1['treinabilidade'],
-                    f"{info_raca2['raca']}": "⭐" * info_raca2['treinabilidade']
-                },
-                {
-                    "Característica / Atributo": "Popularidade (2020)",
-                    f"{info_raca1['raca']}": f"#{info_raca1['popularidade']}" if info_raca1['popularidade'] > 0 else "N/A",
-                    f"{info_raca2['raca']}": f"#{info_raca2['popularidade']}" if info_raca2['popularidade'] > 0 else "N/A"
-                }
-            ]
+        energia_media = dados.calcular_energia_media(racas)
+        col2.metric("Energia Média Geral", f"{energia_media:.1f} / 5")
 
-            st.dataframe(tabela_comparacao, use_container_width=True, hide_index=True)
+        mais_popular = dados.encontrar_mais_popular(racas)
+        if mais_popular:
+            col3.metric("Raça Mais Popular (2020)", mais_popular["raca"])
+            col3.caption(f"Ranking #{mais_popular['popularidade']}")
 
-    st.markdown("---")
+        st.markdown("---")
 
-    # --- BUSCA E FILTROS PRINCIPAIS ---
-    st.header("🔍 Pesquisa e Filtro Geral de Raças")
-    col_busca, col_filtro = st.columns(2)
+    with aba_comparador:
+        st.header("⚖️ Comparador de Raças Lado a Lado")
+        st.markdown("Selecione duas raças para comparar as suas características principais em formato de tabela:")
 
-    busca = col_busca.text_input("Buscar raça por nome")
-    tipo_selecionado = col_filtro.selectbox("Filtrar por Tipo de Pelo", ["Todos"] + listar_tipos_pelo(racas))
+        nomes_racas = [r["raca"] for r in racas]
+        nomes_racas.sort()
 
-    # Aplicar filtros principais da tabela
-    racas_filtradas = filtrar_por_tipo_pelo(racas, tipo_selecionado)
-    encontradas = buscar_por_nome(racas_filtradas, busca)
+        if len(nomes_racas) >= 2:
+            col_comp1, col_comp2 = st.columns(2)
+            raca_1_nome = col_comp1.selectbox("Escolha a 1ª Raça para Comparar", nomes_racas, index=0)
+            opcoes_segunda_raca = [nome for nome in nomes_racas if nome != raca_1_nome]
+            raca_2_nome = col_comp2.selectbox("Escolha a 2ª Raça para Comparar", opcoes_segunda_raca)
 
-    qtd_encontradas = len(encontradas)
 
-    # --- RESULTADOS E TABELA ---
-    if qtd_encontradas == 0:
-        st.warning("⚠️ Nenhum resultado encontrado para os critérios informados.")
-    else:
-        st.success(f"Raças encontradas: {qtd_encontradas}")
-        st.dataframe(montar_tabela(encontradas), use_container_width=True)
+            info_raca1 = next((r for r in racas if r["raca"] == raca_1_nome), None)
+            info_raca2 = next((r for r in racas if r["raca"] == raca_2_nome), None)
+
+            if info_raca1 and info_raca2:
+                # Montar uma tabela dedicada para a comparação
+                tabela_comparacao = [
+                    {
+                        "Característica / Atributo": "Raça",
+                        f"{info_raca1['raca']}": info_raca1['raca'],
+                        f"{info_raca2['raca']}": info_raca2['raca']
+                    },
+                    {
+                        "Característica / Atributo": "Tipo de Pelo",
+                        f"{info_raca1['raca']}": info_raca1['tipo_pelo'],
+                        f"{info_raca2['raca']}": info_raca2['tipo_pelo']
+                    },
+                    {
+                        "Característica / Atributo": "Comprimento do Pelo",
+                        f"{info_raca1['raca']}": info_raca1['comprimento_pelo'],
+                        f"{info_raca2['raca']}": info_raca2['comprimento_pelo']
+                    },
+                    {
+                        "Característica / Atributo": "Nível de Energia (1 a 5)",
+                        f"{info_raca1['raca']}": f"{info_raca1['energia']} / 5 ({dados.classificar_energia(info_raca1['energia'])})",
+                        f"{info_raca2['raca']}": f"{info_raca2['energia']} / 5 ({dados.classificar_energia(info_raca2['energia'])})"
+                    },
+                    {
+                        "Característica / Atributo": "Treinabilidade",
+                        f"{info_raca1['raca']}": "⭐" * info_raca1['treinabilidade'],
+                        f"{info_raca2['raca']}": "⭐" * info_raca2['treinabilidade']
+                    },
+                    {
+                        "Característica / Atributo": "Popularidade (2020)",
+                        f"{info_raca1['raca']}": f"#{info_raca1['popularidade']}" if info_raca1['popularidade'] > 0 else "N/A",
+                        f"{info_raca2['raca']}": f"#{info_raca2['popularidade']}" if info_raca2['popularidade'] > 0 else "N/A"
+                    }
+                ]
+
+                st.dataframe(tabela_comparacao, use_container_width=True, hide_index=True)
+
+        st.markdown("---")
+
+    with aba_catalogo:
+        # --- BUSCA E FILTROS PRINCIPAIS ---
+        st.header("🔍 Pesquisa e Filtro Geral de Raças")
+        col_busca, col_filtro = st.columns(2)
+
+        busca = col_busca.text_input("Buscar raça por nome")
+        tipo_selecionado = col_filtro.selectbox("Filtrar por Tipo de Pelo", ["Todos"] + listar_tipos_pelo(racas))
+
+        # Aplicar filtros principais da tabela
+        racas_filtradas = filtrar_por_tipo_pelo(racas, tipo_selecionado)
+        encontradas = buscar_por_nome(racas_filtradas, busca)
+
+        qtd_encontradas = len(encontradas)
+
+        # --- RESULTADOS E TABELA ---
+        if qtd_encontradas == 0:
+            st.warning("⚠️ Nenhum resultado encontrado para os critérios informados.")
+        else:
+            st.success(f"Raças encontradas: {qtd_encontradas}")
+            st.dataframe(montar_tabela(encontradas), use_container_width=True)
+
+        st.markdown("---")
+
+    with aba_favoritos:
+        st.header("⭐ Minhas Raças Favoritas")
+
+        nome_favorito = st.selectbox(
+            "Selecione uma raça para favoritar",
+            nomes_racas
+        )
+
+        if st.button("Adicionar aos Favoritos"):
+            raca_escolhida = next(
+                r for r in racas if r["raca"] == nome_favorito
+            )
+
+            if dados.salvar_favorito(raca_escolhida):
+                st.success(f"{nome_favorito} adicionada aos favoritos!")
+            else:
+                st.warning("Esta raça já está nos favoritos.")
+
+        favoritos = dados.carregar_favoritos()
+
+        if favoritos:
+            st.subheader("Raças Salvas")
+            st.dataframe(
+                list(favoritos.values()),
+                hide_index=True,
+                use_container_width=True
+            )
+        else:
+            st.info("Nenhuma raça favorita cadastrada.")
 
 if __name__ == "__main__":
     main()
