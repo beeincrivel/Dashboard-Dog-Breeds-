@@ -65,6 +65,15 @@ def classificar_energia(energia):
     else:
         return "Alta (Energético)"
 
+def obter_extremos_energia(racas):
+    """Retorna a menor e a maior energia das raças."""
+    if not racas:
+        return 0, 0
+
+    energias = [raca["energia"] for raca in racas]
+
+    return min(energias), max(energias)
+
 
 def calcular_energia_media(racas):
     """Calcula a média do nível de energia de todas as raças."""
@@ -167,6 +176,21 @@ def remover_favorito(nome):
     gravar_favoritos(favoritos)
     return True
 
+def tipos_pelo_sem_favoritos(racas, favoritos):
+    """Identifica tipos de pelo ainda não representados nos favoritos."""
+    todos = set()
+    favoritados = set()
+
+    for raca in racas:
+        tipo = raca["tipo_pelo"]
+
+        if tipo:
+            todos.add(tipo)
+
+            if raca["raca"] in favoritos:
+                favoritados.add(tipo)
+
+    return todos - favoritados
 
 if __name__ == "__main__":
     # Teste isolado no terminal: execute 'python dados.py'

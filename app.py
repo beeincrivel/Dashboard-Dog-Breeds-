@@ -54,7 +54,6 @@ def main():
     st.title("🐶 Dashboard de Raças de Cães")
     st.markdown("Explore dados e características das raças de cães do American Kennel Club.")
 
-    # Carreg
     racas = dados.carregar_racas()
     if not racas:
         st.error("Não foi possível carregar as raças. Verifique o arquivo racas-de-caes.csv.")
@@ -72,6 +71,12 @@ def main():
 
         energia_media = dados.calcular_energia_media(racas)
         col2.metric("Energia Média Geral", f"{energia_media:.1f} / 5")
+
+        menor_energia, maior_energia = dados.obter_extremos_energia(racas)
+
+        st.caption(
+            f"Faixa de energia das raças: {menor_energia} a {maior_energia} / 5"
+        )
 
         mais_popular = dados.encontrar_mais_popular(racas)
         if mais_popular:
@@ -137,20 +142,32 @@ def main():
         st.markdown("---")
 
     with aba_catalogo:
-        # --- BUSCA E FILTROS PRINCIPAIS ---
         st.header("🔍 Pesquisa e Filtro Geral de Raças")
         col_busca, col_filtro = st.columns(2)
 
         busca = col_busca.text_input("Buscar raça por nome")
         tipo_selecionado = col_filtro.selectbox("Filtrar por Tipo de Pelo", ["Todos"] + listar_tipos_pelo(racas))
-
-        # Aplicar filtros principais da tabela
+        ordenacao = st.selectbox(
+            "Ordenar resultados por",
+            ["Popularidade (2020)", "Nome (A-Z)"]
+        )
         racas_filtradas = filtrar_por_tipo_pelo(racas, tipo_selecionado)
         encontradas = buscar_por_nome(racas_filtradas, busca)
+        if ordenacao == "Nome (A-Z)":
+            encontradas = sorted(
+                encontradas,
+                key=lambda raca: raca["raca"].lower()
+            )
+        else:
+            encontradas = sorted(
+                encontradas,
+                key=lambda raca: (
+                    raca["popularidade"] <= 0,
+                    raca["popularidade"]
+                )
+            )
 
         qtd_encontradas = len(encontradas)
-
-        # --- RESULTADOS E TABELA ---
         if qtd_encontradas == 0:
             st.warning("⚠️ Nenhum resultado encontrado para os critérios informados.")
         else:
@@ -186,6 +203,15 @@ def main():
                 hide_index=True,
                 use_container_width=True
             )
+            tipos_pendentes = dados.tipos_pelo_sem_favoritos(racas, favoritos)
+
+            with st.expander(
+                f"Tipos de pelo ainda sem favoritos: {len(tipos_pendentes)}"
+            ):
+                if tipos_pendentes:
+                    st.write(", ".join(sorted(tipos_pendentes)))
+                else:
+                    st.success("Todos os tipos de pelo estão representados!")
             st.subheader("✏️ Editar Favorito")
 
             nome_edicao = st.selectbox(
