@@ -127,6 +127,46 @@ def salvar_favorito(raca):
 
     return True
 
+def gravar_favoritos(favoritos):
+    """Regrava o arquivo CSV com os favoritos atualizados."""
+    with open(CAMINHO_FAVORITOS, "w", encoding="utf-8", newline="") as arquivo:
+        escritor = csv.DictWriter(arquivo, fieldnames=CAMPOS_FAVORITOS)
+        escritor.writeheader()
+
+        for nome, favorito in favoritos.items():
+            escritor.writerow({
+                "raca": nome,
+                "status": favorito["status"],
+                "comentario": favorito["comentario"]
+            })
+
+
+def atualizar_favorito(nome, status, comentario):
+    """Atualiza o status e o comentário de um favorito."""
+    favoritos = carregar_favoritos()
+
+    if nome not in favoritos:
+        return False
+
+    favoritos[nome].update({
+        "status": status,
+        "comentario": comentario
+    })
+
+    gravar_favoritos(favoritos)
+    return True
+
+def remover_favorito(nome):
+    """Remove uma raça dos favoritos e atualiza o CSV."""
+    favoritos = carregar_favoritos()
+
+    if nome not in favoritos:
+        return False
+
+    del favoritos[nome]
+    gravar_favoritos(favoritos)
+    return True
+
 
 if __name__ == "__main__":
     # Teste isolado no terminal: execute 'python dados.py'

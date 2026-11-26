@@ -184,6 +184,51 @@ def main():
                 hide_index=True,
                 use_container_width=True
             )
+            st.subheader("✏️ Editar Favorito")
+
+            nome_edicao = st.selectbox(
+                "Selecione a raça para editar",
+                sorted(favoritos.keys())
+            )
+
+            favorito = favoritos[nome_edicao]
+
+            opcoes_status = [
+                "Quero conhecer",
+                "Tenho interesse",
+                "Já conheço"
+            ]
+
+            status = st.selectbox(
+                "Status",
+                opcoes_status,
+                index=opcoes_status.index(favorito["status"]),
+                key=f"status_{nome_edicao}"
+            )
+
+            comentario = st.text_input(
+                "Comentário",
+                value=favorito["comentario"],
+                key=f"comentario_{nome_edicao}"
+            )
+
+            if st.button("Salvar alterações"):
+                if dados.atualizar_favorito(nome_edicao, status, comentario):
+                    st.rerun()
+                else:
+                    st.error("Favorito não encontrado.")
+            st.markdown("---")
+
+            confirmar = st.checkbox(
+                "Confirmo que desejo excluir esta raça dos favoritos",
+                key=f"confirmar_{nome_edicao}"
+            )
+
+            if st.button("🗑️ Excluir favorito", disabled=not confirmar):
+                if dados.remover_favorito(nome_edicao):
+                    st.rerun()
+                else:
+                    st.error("Favorito não encontrado.")
         else:
             st.info("Nenhuma raça favorita cadastrada.")
 
