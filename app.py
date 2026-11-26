@@ -7,13 +7,15 @@ def montar_tabela(racas):
     """Prepara as linhas que aparecem na tabela principal, com nomes de coluna legíveis."""
     tabela = []
     for raca in racas:
+        raca_exibicao = raca.copy()
+        raca_exibicao["treinabilidade"] = "⭐" * raca_exibicao["treinabilidade"]
         linha = {
             "Raça": raca["raca"],
             "Tipo de Pelo": raca["tipo_pelo"],
             "Comprimento": raca["comprimento_pelo"],
             "Nível de Energia": raca["energia"],
             "Faixa de Energia": dados.classificar_energia(raca["energia"]),
-            "Treinabilidade": "⭐" * raca["treinabilidade"],
+            "Treinabilidade": raca_exibicao["treinabilidade"],
             "Popularidade (2020)": raca["popularidade"]
         }
         tabela.append(linha)
